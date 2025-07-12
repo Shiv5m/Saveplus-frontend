@@ -1,0 +1,11 @@
+# Ignore environment variables
+.env
+
+# Ignore build output
+dist
+
+# Node modules
+node_modules
+
+# OS-specific
+.DS_Store
