@@ -85,5 +85,6 @@ function App() {
     </div>
   );
 }
+console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
 
 export default App;
