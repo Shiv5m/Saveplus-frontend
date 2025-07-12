@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import AdminPage from './AdminPage';
 
 function App() {
+  const [showAdmin, setShowAdmin] = useState(false);
   const [merchant, setMerchant] = useState('');
   const [amount, setAmount] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const user_id = 'demo-user-id-123'; // 👈 replace with real user ID later
+  const user_id = 'demo-user-id-123';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,11 +19,7 @@ function App() {
       const res = await fetch('https://saveplus-production.up.railway.app/strategy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id,
-          merchant,
-          amount: parseFloat(amount),
-        }),
+        body: JSON.stringify({ user_id, merchant, amount: parseFloat(amount) }),
       });
 
       const data = await res.json();
@@ -32,6 +30,20 @@ function App() {
 
     setLoading(false);
   };
+
+  if (showAdmin) {
+    return (
+      <div className="p-4">
+        <button
+          onClick={() => setShowAdmin(false)}
+          className="mb-4 bg-gray-200 px-4 py-2 rounded"
+        >
+          ← Back to Main
+        </button>
+        <AdminPage />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
@@ -76,6 +88,15 @@ function App() {
           )}
         </div>
       )}
+
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => setShowAdmin(true)}
+          className="text-sm text-blue-600 underline"
+        >
+          Admin Panel →
+        </button>
+      </div>
     </div>
   );
 }
