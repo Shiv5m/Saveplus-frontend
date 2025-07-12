@@ -19,11 +19,16 @@ export default function AuthPage({ onLogin }) {
   };
 
 const handleGoogle = async () => {
+  const redirectUrl =
+    import.meta.env.MODE === 'development'
+      ? 'http://localhost:3000'
+      : 'https://saveplus-frontend.vercel.app'; // Replace with your real Vercel URL
+
   await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'https://saveplus-frontend.vercel.app' // replace with your actual frontend URL
-    }
+      redirectTo: redirectUrl,
+    },
   });
 };
 
