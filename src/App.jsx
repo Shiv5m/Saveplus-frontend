@@ -1,20 +1,52 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from './supabaseClient';
+import AuthPage from './AuthPage';
 
 function App() {
+  const [session, setSession] = useState(null);
   const [userId, setUserId] = useState('');
   const [merchant, setMerchant] = useState('');
   const [amount, setAmount] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setResult(null);
+  };
+
+  if (!session) {
+    return <AuthPage onLogin={() => supabase.auth.getSession().then(({ data }) => setSession(data.session))} />;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setResult(null);
     try {
       const res = await fetch('https://saveplus-production.up.railway.app/strategy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, merchant, amount: parseFloat(amount) })
+        body: JSON.stringify({
+          user_id: session.user.id,
+          merchant,
+          amount: parseFloat(amount)
+        })
       });
       const data = await res.json();
       setResult(data);
@@ -26,9 +58,11 @@ function App() {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">SavePlus Strategy Finder</h1>
+      <div className="flex justify-between mb-4">
+        <h1 className="text-xl font-bold">SavePlus Strategy</h1>
+        <button onClick={handleLogout} className="text-sm text-red-500">Log out</button>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input className="w-full p-2 border rounded" placeholder="User ID" value={userId} onChange={(e) => setUserId(e.target.value)} required />
         <input className="w-full p-2 border rounded" placeholder="Merchant (e.g., Amazon)" value={merchant} onChange={(e) => setMerchant(e.target.value)} required />
         <input type="number" className="w-full p-2 border rounded" placeholder="Amount (₹)" value={amount} onChange={(e) => setAmount(e.target.value)} required />
         <button className="w-full bg-blue-600 text-white p-2 rounded" type="submit" disabled={loading}>
