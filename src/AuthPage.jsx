@@ -18,9 +18,15 @@ export default function AuthPage({ onLogin }) {
     setLoading(false);
   };
 
-  const handleGoogle = async () => {
-    await supabase.auth.signInWithOAuth({ provider: 'google' });
-  };
+const handleGoogle = async () => {
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://saveplus-frontend.vercel.app' // replace with your actual frontend URL
+    }
+  });
+};
+
 
   return (
     <div className="max-w-sm mx-auto mt-10 p-6 bg-white rounded shadow space-y-4">
