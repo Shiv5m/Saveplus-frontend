@@ -24,12 +24,13 @@ const handleGoogle = async () => {
       ? 'http://localhost:3000'
       : 'https://saveplus-frontend.vercel.app'; // Replace with your real Vercel URL
 
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
+ await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    redirectTo: 'https://saveplus-frontend.vercel.app', // ✅ your Vercel URL
+  },
+});
+
 };
 
 
